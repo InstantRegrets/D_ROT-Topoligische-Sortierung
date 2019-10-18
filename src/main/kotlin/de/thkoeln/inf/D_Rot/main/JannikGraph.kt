@@ -1,6 +1,4 @@
 package de.thkoeln.inf.D_Rot.main
-
-import java.util.*
 import kotlin.collections.ArrayList
 
 fun main(){
