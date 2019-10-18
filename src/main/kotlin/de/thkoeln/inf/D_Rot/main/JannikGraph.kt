@@ -3,26 +3,36 @@ package de.thkoeln.inf.D_Rot.main
 import java.util.*
 import kotlin.collections.ArrayList
 
-class Graph {
+fun main(){
+    val g = JannikGraph()
+    g.addNode(1)
+    g.addNode(2)
+    g.addNode(3)
+    g.addEdge(g.nodes[0],g.nodes[1])
+    g.addEdge(g.nodes[0],g.nodes[2])
+    println("${g.edges[1].from.label} to ${g.edges[1].to.label}")
+    println(g.nodes[2].indegree)
+
+}
+
+class JannikGraph {
     val edges: ArrayList<Edge> = arrayListOf()
     val nodes: ArrayList<Node> = arrayListOf()
-    inner class Node(var label: Int, var indegree: Int = 0) {
-        val adjacentEdges: ArrayList<Edge> = arrayListOf()
+    inner class Node(var label: Int, var indegree: Int = 0, val adjacentEdges : ArrayList<Edge> = arrayListOf()) {
         init {
-            edges.forEach{
-                if (it.from==this) {
-                    adjacentEdges.add(it)
-                    it.to.indegree++
-                }
-                if (it.to == this)
-                    indegree++
+            adjacentEdges.forEach{
+                it.to.indegree++
+                edges.add(it)
             }
         }
     }
     class Edge(val from: Node, val to: Node)
+    fun addNode(label: Int) = nodes.add(Node(label))
 
-    fun addNode(input: Node) = nodes.add(input)
-    fun addEdge(from: Node, to: Node) = edges.add(Edge(from, to))
+    fun addEdge(from: Node, to: Node){
+        edges.add(Edge(from, to))
+        to.indegree++
+    }
     fun findRoots(input: Node): ArrayList<Node>{
         val nodesTemp = arrayListOf<Node>()
         nodes.forEach{
@@ -30,6 +40,7 @@ class Graph {
                 nodesTemp.push(it)
                 inductiveStep(it)
         }
+        return nodesTemp
     }
 
     private fun inductiveStep(input: Node){
