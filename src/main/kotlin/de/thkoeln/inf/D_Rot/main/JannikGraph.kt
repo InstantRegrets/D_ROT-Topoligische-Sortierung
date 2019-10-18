@@ -33,7 +33,7 @@ class JannikGraph {
         edges.add(Edge(from, to))
         to.indegree++
     }
-    fun findRoots(input: Node): ArrayList<Node>{
+    fun findRoots(): ArrayList<Node>{
         val nodesTemp = arrayListOf<Node>()
         nodes.forEach{
             if (it.indegree==0)
