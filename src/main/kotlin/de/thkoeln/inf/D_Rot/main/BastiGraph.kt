@@ -13,12 +13,11 @@ class BastiGraph{
         val size = nodes.size+1
         nodes.fillToSize(size, arrayListOf())
         nodes.forEach { it.fillToSize(size,0) }
-        println(nodes)
         dependencies.forEach {
             // adds a -1 for all the dependencies
-            nodes.last().add(it,-1)
+            nodes.last()[it]=-1
             //adds the 1 for all other stuff that depend on it
-            nodes[it].add(nodes.lastIndex+1,1)
+            nodes[it][nodes.lastIndex]=1
         }
     }
 
@@ -55,6 +54,13 @@ class BastiGraph{
             this.getOrElse(it){ this.add(value)}
         }
     }
+
+    /**
+     * outputs the Graph
+     */
+    override fun toString(): String {
+        return nodes.toString()
+    }
 }
 
 fun main(){
@@ -64,6 +70,11 @@ fun main(){
     g.addNode(arrayListOf(0))
     g.addNode(arrayListOf(1,2))
     g.addNode(arrayListOf())
-    println(g.findRoots())
+    println("graph: $g")
+    g.removeNode(0)
+    println("removeing node 0: $g")
+    println("all Roots: ${g.findRoots()}")
+    println("indegree of 0: ${g.inDegree(0)}")
+    
 }
 
