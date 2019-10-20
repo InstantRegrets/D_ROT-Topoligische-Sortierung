@@ -6,10 +6,13 @@ fun main(){
     g.addNode(1)
     g.addNode(2)
     g.addNode(3)
+    g.addNode(4)
+    g.addNode(5)
     g.addEdge(g.nodes[0],g.nodes[1])
     g.addEdge(g.nodes[0],g.nodes[2])
     println("${g.edges[1].from.label} to ${g.edges[1].to.label}")
     println(g.nodes[2].indegree)
+    g.findRoots().forEach{println(it.label)}
 
 }
 
