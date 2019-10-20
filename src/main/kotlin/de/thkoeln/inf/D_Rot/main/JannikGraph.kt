@@ -10,10 +10,9 @@ fun main(){
     g.addNode(5)
     g.addEdge(g.nodes[0],g.nodes[1])
     g.addEdge(g.nodes[0],g.nodes[2])
-    println("${g.edges[1].start.label} end ${g.edges[1].end.label}")
-    println(g.nodes[2].indegree)
-    g.findRoots().forEach{println(it.label)}
-
+    g.findRoots().toString()
+    g.edges.forEach { println(it) }
+    g.nodes.forEach { println(it) }
 }
 
 /**
@@ -25,23 +24,26 @@ class JannikGraph {
     val nodes: ArrayList<Node> = arrayListOf()
 
     /**
-     * Nodes contain a label for display purposes, a variable indegree, which is inizialized at 0 and updated whenever
-     * an edge is created containing this node. Also contains a List with Edges that start at this node, which is used
-     * end update the indegree of following nodes
+     * Nodes contain a label for display purposes, a variable indegree, which is initialised at 0 and updated whenever
+     * an edge is created containing this node.
      */
-    inner class Node(var label: Int, var indegree: Int = 0, val adjacentEdges : ArrayList<Edge> = arrayListOf()) {
-        init { //only relevant when processing subtrees
-            adjacentEdges.forEach{
-                it.end.indegree++
-                edges.add(it)
-            }
+    data class Node(var label: Int) {
+        var indegree: Int = 0
+        val adjacentEdges : ArrayList<Edge> = arrayListOf()
+
+        override fun toString(): String {
+            return label.toString()
         }
     }
 
     /**
      * Edges contain two nodes, one starter and one end node
      */
-    class Edge(val start: Node, val end: Node)
+    class Edge(val start: Node, val end: Node){
+        override fun toString(): String {
+            return "$start --> $end"
+        }
+    }
 
     /*
     *  Graph functions
@@ -55,24 +57,26 @@ class JannikGraph {
      * adds an Edge with a given start and end point, also updates indegree of end node
      */
     fun addEdge(start: Node, end: Node){
-        edges.add(Edge(start, end))
+        val temp = Edge(start,end)
+        edges.add(temp)
+        /*
+            temp is a newly created edge with a node as a starting point.
+            Because edges have to be created after nodes, the node doesnt know this edge yet.
+            To fix this, we add temp to the adjacentEdge-List in the starter node
+         */
+        temp.start.adjacentEdges.add(temp)
         end.indegree++
     }
 
     /**
      * @return an Array with all starting nodes
      */
-    fun findRoots(): List<Node> = nodes.filter{it.indegree==0}
-    /*{
-        val nodesTemp = arrayListOf<Node>()
-        nodes.forEach{
-            if (it.indegree==0)
-                nodesTemp.push(it)
-                //inductiveStep(it)
-        }
-        return nodesTemp
+
+    fun removeNode(input: Int){
+        nodes.forEach { if (it.label == input) nodes.remove(it) }
     }
-    */
+
+    fun findRoots(): List<Node> = nodes.filter{it.indegree==0}
 
     private fun inductiveStep(input: Node){
         input.adjacentEdges.forEach {
@@ -82,6 +86,7 @@ class JannikGraph {
             }
         }
     }
+
 }
 
 //adding functions for list to behave like stack
