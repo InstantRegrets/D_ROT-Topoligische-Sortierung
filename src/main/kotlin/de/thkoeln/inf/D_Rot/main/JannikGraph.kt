@@ -6,19 +6,13 @@ fun main(){
     g.addNode(1)
     g.addNode(2)
     g.addNode(3)
-    g.addNode(4)
-    g.addNode(5)
-    g.addEdge(g.nodes[0],g.nodes[1])
-    g.addEdge(g.nodes[0],g.nodes[2])
-    g.findRoots().toString()
-    g.edges.forEach { println(it) }
-    g.nodes.forEach { println(it) }
+    g.addEdge(g.addNode(4),g.addNode(5))
+    println(g.topologicalSort())
 }
 
 /**
  * Graph class handles Nodes and Edges, both in seperate Arrays
  */
-
 class JannikGraph {
     val edges: ArrayList<Edge> = arrayListOf()
     val nodes: ArrayList<Node> = arrayListOf()
@@ -32,7 +26,12 @@ class JannikGraph {
         val adjacentEdges : ArrayList<Edge> = arrayListOf()
 
         override fun toString(): String {
-            return label.toString()
+            return "[${label.toString()}]"
+        }
+
+        override fun equals(other: Any?): Boolean {
+            val t = other as Node
+            return t.label == label
         }
     }
 
@@ -51,7 +50,11 @@ class JannikGraph {
     /**
      *  adds a Node with a given label to the Node-Array
      */
-    fun addNode(label: Int) = nodes.add(Node(label))
+    fun addNode(label: Int): Node {
+        val temp = Node(label)
+        nodes.add(temp)
+        return temp
+    }
 
     /**
      * adds an Edge with a given start and end point, also updates indegree of end node
@@ -65,7 +68,7 @@ class JannikGraph {
             To fix this, we add temp to the adjacentEdge-List in the starter node
          */
         temp.start.adjacentEdges.add(temp)
-        end.indegree++
+        end.indegree-=-1    //end.indegree++
     }
 
     /**
@@ -78,15 +81,31 @@ class JannikGraph {
 
     fun findRoots(): List<Node> = nodes.filter{it.indegree==0}
 
-    private fun inductiveStep(input: Node){
-        input.adjacentEdges.forEach {
-            if (it.start == input){
-                it.end.indegree--
-                edges.remove(it)
+    private val stack: ArrayList<Node> = arrayListOf()
+
+    private fun inductiveStep(zeroNode: Node, out: ArrayList<Node>): ArrayList<Node>{
+        val zeroIn = findRoots()
+        while (zeroIn.isNotEmpty()) {
+                out.push(zeroIn.first()) //push it to out stack, for output
+                zeroIn.first().adjacentEdges.forEach {
+                    //process subnodes iteratively
+                    it.end.indegree += -1 //set subnodes indegree+=-1
+                    if (it.end.indegree == 0) //if subnode falls to zero, process that node (push to stack)
+                        zeroIn.plus(it.end) //recursive step
+                    edges.remove(it) //remove edge from array
+                }
             }
         }
+
+    fun topologicalSort(): ArrayList<Node>{
+        val out = arrayListOf<Node>()
+        inductiveStep(nodes.find { it.indegree==0 }?: return out, out)
+        return out
     }
 
+    override fun toString(): String {
+        return ""
+    }
 }
 
 //adding functions for list to behave like stack
