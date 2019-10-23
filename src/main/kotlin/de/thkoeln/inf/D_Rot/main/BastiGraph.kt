@@ -80,15 +80,15 @@ class BastiGraph {
      * Vorgehen:
      *      - setze den aktuellen node auf visited
      *      - laufe alle parents durch
-     *          - laufe für jeden parent erneut die depth first Search durch
+     *          - laufe für jeden successor erneut die depth first Search durch
      *      - passe das ordering output an. speichert an der letzten nicht gesetzten variable (index) den aktuellen node
      *      - und ändere den index, so das er jezt auf das die neue letzte nicht gesetzte variable im ordering zeigt
      */
     private fun depthFirstSearch(index: Int, at: Int, visited: Array<Boolean>, ordering: Array<Int>): Int {
         var i = index
         visited[at] = true
-        val parents = parents(at)
-        for( p in parents){
+        val successors = successor(at)
+        for( p in successors){
             if (!visited[p])
                 i = depthFirstSearch(i, p,visited, ordering)
         }
@@ -99,7 +99,7 @@ class BastiGraph {
     /**
      * gibt die parents ( wo die nodes hinzeigen) für einen node zurück
      */
-    private fun parents(node: Int): List<Int> {
+    private fun successor(node: Int): List<Int> {
         val l = mutableListOf<Int>()
         for ((index, it) in nodes[node].withIndex()) {
             if (it == 1)
