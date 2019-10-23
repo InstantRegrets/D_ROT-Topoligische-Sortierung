@@ -5,7 +5,6 @@ package de.thkoeln.inf.D_Rot.main
  * Graph class handles all nodes
  */
 class BastiGraph {
-
     //    ____             __  _         ______                 __       ________
     //   / __ )____ ______/ /_(_)____   / ____/________ _____  / /_     / ____/ /___ ___________
     //  / __  / __ `/ ___/ __/ / ___/  / / __/ ___/ __ `/ __ \/ __ \   / /   / / __ `/ ___/ ___/
@@ -45,16 +44,78 @@ class BastiGraph {
         nodes[note]
             .filter { it == -1 }
             .size
+
+
+    //                               __   _____  __          ____ ____
+    //     ____ _ ____   ____   ____/ /  / ___/ / /_ __  __ / __// __/
+    //    / __ `// __ \ / __ \ / __  /   \__ \ / __// / / // /_ / /_
+    //   / /_/ // /_/ // /_/ // /_/ /   ___/ // /_ / /_/ // __// __/
+    //   \__, / \____/ \____/ \__,_/   /____/ \__/ \__,_//_/  /_/
+    //  /____/
+
     /**
-     * returns a list of all the roots
+     * topologische sortierung. Findet Die Torpologische Sortierung Vorgang:
+     *      - irgend ein random node nehmen (einfach den ersten in unseren fall)
+     *      - schauen ob er visited ist, wenn nicht -> visiten (depth first search)
+     *          dadurch wird dieser automatisch auf visited gezogen und der output value vom mit gezählten
+     *          index wird gesetzt (vergleiche Graphik eta)
+     *      - geordnete Liste zurückgeben
      */
-    fun findRoots(): List<Int> =
-        nodes.mapIndexedNotNull {
-                index, value ->
-            index.takeIf { !value.contains(-1) }
+    fun topologicalSort(): List<Int> {
+        val n = nodes.size
+        val visited = Array(n) { false } //array of all the visited nodes
+        val ordering = Array(n) { 0 } //ouput
+        var i= n -1 //index pointing at the last element
+
+        for( at in nodes.indices){
+            if (!visited[at]){
+                i = depthFirstSearch(i,at,visited, ordering)
+            }
         }
+        return ordering.toList()
+    }
+
+    /**
+     * Geht für einen bestimmten node (at) ein depth first Search durch. Hierbei beachtetet er nur nicht-besuchte nodes
+     * Vorgehen:
+     *      - setze den aktuellen node auf visited
+     *      - laufe alle parents durch
+     *          - laufe für jeden parent erneut die depth first Search durch
+     *      - passe das ordering output an. speichert an der letzten nicht gesetzten variable (index) den aktuellen node
+     *      - und ändere den index, so das er jezt auf das die neue letzte nicht gesetzte variable im ordering zeigt
+     */
+    private fun depthFirstSearch(index: Int, at: Int, visited: Array<Boolean>, ordering: Array<Int>): Int {
+        var i = index
+        visited[at] = true
+        val parents = parents(at)
+        for( p in parents){
+            if (!visited[p])
+                i = depthFirstSearch(i, p,visited, ordering)
+        }
+        ordering[i] = at
+        return i-1
+    }
+
+    /**
+     * gibt die parents ( wo die nodes hinzeigen) für einen node zurück
+     */
+    private fun parents(node: Int): List<Int> {
+        val l = mutableListOf<Int>()
+        for ((index, it) in nodes[node].withIndex()) {
+            if (it == 1)
+                l.add(index)
+        }
+        return l
+    }
 
 
+
+    //    __               _
+    //   / /_  ____  _____(_)___  ____ _
+    //  / __ \/ __ \/ ___/ / __ \/ __ `/
+    // / /_/ / /_/ / /  / / / / / /_/ /
+    ///_.___/\____/_/  /_/_/ /_/\__, /
+    //                         /____/
     /**
      * helpers function to fill the Array to the given size
      */
@@ -70,6 +131,8 @@ class BastiGraph {
     override fun toString(): String {
         return nodes.toString()
     }
+
+
 }
 
 fun main(){
@@ -79,11 +142,7 @@ fun main(){
     g.addNode(arrayListOf(0))
     g.addNode(arrayListOf(1,2))
     g.addNode(arrayListOf())
-    println("graph: $g")
-    g.removeNode(0)
-    println("removeing node 0: $g")
-    println("all Roots: ${g.findRoots()}")
-    println("indegree of 0: ${g.inDegree(0)}")
-    
+    println(g)
+    println(g.topologicalSort())
 }
 

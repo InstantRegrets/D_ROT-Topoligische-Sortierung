@@ -95,6 +95,7 @@ class JannikGraph {
                     edges.remove(it) //remove edge from array
                 }
             }
+        TODO()
         }
 
     fun topologicalSort(): ArrayList<Node>{
