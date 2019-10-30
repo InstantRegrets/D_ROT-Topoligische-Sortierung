@@ -6,47 +6,65 @@ fun main(){
     g.addNode(1)
     g.addNode(2)
     g.addNode(3)
-    g.addEdge(g.addNode(4),g.addNode(5))
-    println(g.topologicalSort())
+    g.addNode(4)
+    g.addEdge(4,2)
+    g.addEdge(4,3)
+    g.addEdge(2,1)
+    g.addEdge(3,1)
+    g.topologicalSort().forEach { println(it.label) }
+
+
 }
 
+//     _____                 _
+//    / ____|               | |
+//   | |  __ _ __ __ _ _ __ | |__
+//   | | |_ | '__/ _` | '_ \| '_ \
+//   | |__| | | | (_| | |_) | | | |
+//    \_____|_|  \__,_| .__/|_| |_|
+//                    | |
+//                    |_|
+
 /**
- * Graph class handles Nodes and Edges, both in seperate Arrays
+ * Graph class handles all Nodes
  */
 class JannikGraph {
-    val edges: ArrayList<Edge> = arrayListOf()
-    val nodes: ArrayList<Node> = arrayListOf()
+    private val nodes: ArrayList<Node> = arrayListOf()
 
     /**
      * Nodes contain a label for display purposes, a variable indegree, which is initialised at 0 and updated whenever
      * an edge is created containing this node.
      */
-    data class Node(var label: Int) {
-        var indegree: Int = 0
-        val adjacentEdges : ArrayList<Edge> = arrayListOf()
-
-        override fun toString(): String {
-            return "[${label.toString()}]"
-        }
-
+    data class Node(var label: Int){
+        //must override to compare nodes and int
         override fun equals(other: Any?): Boolean {
-            val t = other as Node
-            return t.label == label
+            if (other is Node){
+                return this.label == other.label
+            }
+            else if (other is Int)
+            {
+                return this.label == other
+            }
+            return false
         }
-    }
 
-    /**
-     * Edges contain two nodes, one starter and one end node
-     */
-    class Edge(val start: Node, val end: Node){
-        override fun toString(): String {
-            return "$start --> $end"
+        var indegree: Int = 0
+        val successors : ArrayList<Node> = arrayListOf()
+        val predecessors : ArrayList<Node> = arrayListOf()
+
+        override fun hashCode(): Int {
+            return label
         }
     }
 
     /*
     *  Graph functions
     */
+
+    fun retrieveNodeOf(input: Int): Node?{
+        return nodes.find { it.label == input }
+    }
+
     /**
      *  adds a Node with a given label to the Node-Array
      */
@@ -59,53 +77,97 @@ class JannikGraph {
     /**
      * adds an Edge with a given start and end point, also updates indegree of end node
      */
-    fun addEdge(start: Node, end: Node){
-        val temp = Edge(start,end)
-        edges.add(temp)
-        /*
-            temp is a newly created edge with a node as a starting point.
-            Because edges have to be created after nodes, the node doesnt know this edge yet.
-            To fix this, we add temp to the adjacentEdge-List in the starter node
-         */
-        temp.start.adjacentEdges.add(temp)
-        end.indegree-=-1    //end.indegree++
+    fun addEdge(start: Int, end: Int){
+        val temp = retrieveNodeOf(start)
+        val temp2 = retrieveNodeOf(end)
+        if (temp != null && temp2 != null) {
+            println("found ${temp.label} and ${temp2.label}")
+            temp.successors.add(temp2)
+            temp2.predecessors.add(temp)
+            temp2.indegree++
+        }
+        else{
+            println("ungültiger Input")
+        }
     }
 
     /**
-     * @return an Array with all starting nodes
+     * function checks for the given start and end label if an edge with these two nodes exists and removes
+     * it, if found.
+     * @param start is the Label of the desired start node
+     * @param end is the label of the desired end node
      */
-
-    fun removeNode(input: Int){
-        nodes.forEach { if (it.label == input) nodes.remove(it) }
+    fun removeEdge(start: Int, end: Int){
+        val startNode = retrieveNodeOf(start)
+        val endNode = retrieveNodeOf(end)
+        if(startNode != null && endNode != null){
+            if (startNode.successors.contains(endNode) && endNode.predecessors.contains(startNode)){
+                startNode.successors.remove(endNode)
+                endNode.predecessors.remove(startNode)
+            }
+            TODO("Cleanup?")
+        }
     }
 
-    fun findRoots(): List<Node> = nodes.filter{it.indegree==0}
+    /**
+     * removes node with given label from the node array
+     * @param input label of node to remove as Int
+     */
+    fun removeNode(input: Int){
+        nodes.remove(retrieveNodeOf(input))
+    }
 
-    private val stack: ArrayList<Node> = arrayListOf()
+    /**
+     *
+     * @return an array with all starting nodes
+     */
+    private fun findRoots(): List<Node> = nodes.filter{it.indegree==0}
 
-    private fun inductiveStep(zeroNode: Node, out: ArrayList<Node>): ArrayList<Node>{
-        val zeroIn = findRoots()
-        while (zeroIn.isNotEmpty()) {
-                out.push(zeroIn.first()) //push it to out stack, for output
-                zeroIn.first().adjacentEdges.forEach {
-                    //process subnodes iteratively
-                    it.end.indegree += -1 //set subnodes indegree+=-1
-                    if (it.end.indegree == 0) //if subnode falls to zero, process that node (push to stack)
-                        zeroIn.plus(it.end) //recursive step
-                    edges.remove(it) //remove edge from array
+//             _                  _ _   _
+//       /\   | |                (_) | | |
+//      /  \  | | __ _  ___  _ __ _| |_| |__  _ __ ___
+//     / /\ \ | |/ _` |/ _ \| '__| | __| '_ \| '_ ` _ \
+//    / ____ \| | (_| | (_) | |  | | |_| | | | | | | | |
+//   /_/    \_\_|\__, |\___/|_|  |_|\__|_| |_|_| |_| |_|
+//                __/ |
+//               |___/
+
+
+    //global var to be invoked by topologicalSort() and to be changed by inductiveStep
+    //contains all nodes with an indegree of 0, for the topological sort to use
+    private var zeroNodes: MutableList<Node> = arrayListOf()
+    /**
+     * inductiveStep takes the node to process, decreases the indegree of all successor nodes, checks if their indegree
+     * is now 0 and if so, adds them to the list of nodes to process (zeroNodes).
+     * it then proceeds to mark the current node as processed (removing it from the array and adding it to the output array)
+     * @param nodeToProcess a node with an indegree of 0
+     * @param out ArrayList of type node which will be the output list
+     * @return changed output arrayList
+     */
+    private fun inductiveStep(nodeToProcess: Node, out: ArrayList<Node>): ArrayList<Node>{
+            nodeToProcess.successors.forEach {
+                it.indegree--
+                if (it.indegree==0){
+                    zeroNodes.add(it)
                 }
+                it.predecessors.remove(nodeToProcess)
             }
-        TODO()
-        }
-
-    fun topologicalSort(): ArrayList<Node>{
-        val out = arrayListOf<Node>()
-        inductiveStep(nodes.find { it.indegree==0 }?: return out, out)
+        zeroNodes.remove(nodeToProcess)
+        out.add(nodeToProcess)
         return out
     }
 
-    override fun toString(): String {
-        return ""
+    /**
+     * topological sorting of the graph
+     * @return sorted ArrayList
+     */
+    fun topologicalSort(): ArrayList<Node>{
+        zeroNodes = findRoots().toMutableList()
+        val out = arrayListOf<Node>()
+        while (zeroNodes.isNotEmpty()){
+            inductiveStep(zeroNodes.first(),out)
+        }
+        return out
     }
 }
 
