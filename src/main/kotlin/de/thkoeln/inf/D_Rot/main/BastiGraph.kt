@@ -1,10 +1,29 @@
 package de.thkoeln.inf.D_Rot.main
 
+import kotlin.math.max
+
 
 /**
  * Graph class handles all nodes
  */
-class BastiGraph {
+class BastiGraph:CustomGraph {
+    override fun addEdge(start: Int, end: Int) {
+        nodes[start][end] = 1
+        nodes[end][start] = -1
+    }
+
+    override fun removeEdge(start: Int, end: Int) {
+        nodes[start][end] = 0
+        nodes[end][start] = 0
+    }
+
+    override fun findRoots(): Collection<Any> {
+        val t =  nodes.filterNot { it.contains(-1) }
+        return t.map {
+            nodes.indexOf(it)
+        }
+
+    }
     //    ____             __  _         ______                 __       ________
     //   / __ )____ ______/ /_(_)____   / ____/________ _____  / /_     / ____/ /___ ___________
     //  / __  / __ `/ ___/ __/ / ___/  / / __/ ___/ __ `/ __ \/ __ \   / /   / / __ `/ ___/ ___/
@@ -17,24 +36,18 @@ class BastiGraph {
     /**
      * adds a Node to the Graph
      */
-    fun addNode(dependencies: Collection<Int> ){
-        val size = nodes.size+1
-        nodes.fillToSize(size, arrayListOf())
-        nodes.forEach { it.fillToSize(size,0) }
-        dependencies.forEach {
-            // adds a -1 for all the dependencies
-            nodes.last()[it]=-1
-            //adds the 1 for all other stuff that depend on it
-            nodes[it][nodes.lastIndex]=1
-        }
+    override fun addNode(input: Int){
+        val size = max(nodes.size, input+1)
+        nodes.fillToSize(size)
+        nodes.forEach { it.fillToSize(size) }
     }
 
     /**
      * removes the given node from the Graph
      */
-    fun removeNode(node: Int){
-        nodes.forEach { it.removeAt(node) }
-        nodes.removeAt(node)
+    override fun removeNode(input: Int){
+        nodes.forEach { it.removeAt(input) }
+        nodes.removeAt(input)
     }
 
     /**
@@ -61,7 +74,7 @@ class BastiGraph {
      *          index wird gesetzt (vergleiche Graphik eta)
      *      - geordnete Liste zurückgeben
      */
-    fun topologicalSort(): List<Int> {
+    override fun topologicalSort(): List<Int> {
         val n = nodes.size
         val visited = Array(n) { false } //array of all the visited nodes
         val ordering = Array(n) { 0 } //ouput
@@ -119,9 +132,14 @@ class BastiGraph {
     /**
      * helpers function to fill the Array to the given size
      */
-    private fun<E> ArrayList<E>.fillToSize(index: Int, value: E){
+    private fun ArrayList<Int>.fillToSize(index: Int, value: Int=0){
         repeat(index){
             this.getOrElse(it){ this.add(value)}
+        }
+    }
+    private fun<E> ArrayList<ArrayList<E>>.fillToSize(index: Int){
+        repeat(index){
+            this.getOrElse(it){ this.add(arrayListOf()) }
         }
     }
 
@@ -129,19 +147,18 @@ class BastiGraph {
      * outputs the Graph
      */
     override fun toString(): String {
-        return nodes.toString()
+        var a = ""
+        nodes.forEach { a="$a\n$it" }
+        return a
     }
-
 
 }
 
 fun main(){
     val g = BastiGraph()
-    g.addNode(arrayListOf())
-    g.addNode(arrayListOf(0))
-    g.addNode(arrayListOf(0))
-    g.addNode(arrayListOf(1,2))
-    g.addNode(arrayListOf())
+    g.addNode(5)
+    g.addEdge(1,3)
+    g.addEdge(1,4)
     println(g)
     println(g.topologicalSort())
 }
