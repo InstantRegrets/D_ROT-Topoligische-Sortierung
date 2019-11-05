@@ -19,7 +19,7 @@ interface CustomGraph {
 
     fun findRoots(): Collection<Any>
 
-    fun isAcyclic(): Boolean
+    fun isAcyclic(input: JannikGraph.Node): Boolean
 
     fun toVizNodes():List<Node>
 

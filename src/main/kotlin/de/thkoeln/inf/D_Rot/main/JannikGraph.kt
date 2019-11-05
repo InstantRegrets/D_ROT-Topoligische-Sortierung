@@ -33,8 +33,26 @@ fun main(){
  */
 class JannikGraph: CustomGraph {
 
-    override fun isAcyclic(): Boolean {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    private val visited = arrayListOf<Boolean>()
+    override fun isAcyclic(input: Node): Boolean {
+        visited.clear()
+        visited.fillToSize(nodes.size)
+        visited[nodes.indexOf(input)] = true
+        input.successors.forEach {
+            if (visited[nodes.indexOf(it)]){
+                return false
+            }
+            else{
+                isAcyclic(it)
+            }
+        }
+        return true
+    }
+
+    private fun ArrayList<Boolean>.fillToSize(index: Int, value: Boolean=false){
+        repeat(index){
+            this.getOrElse(it){ this.add(value)}
+        }
     }
 
     private val nodes: ArrayList<Node> = arrayListOf()
@@ -172,7 +190,7 @@ class JannikGraph: CustomGraph {
         out.add(nodeToProcess)
         return out
     }
-    fun  Node.toVizBode(): guru.nidi.graphviz.model.Node =
+    fun Node.toVizBode(): guru.nidi.graphviz.model.Node =
         node(this.label.toString())
 
 
