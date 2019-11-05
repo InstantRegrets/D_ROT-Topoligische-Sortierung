@@ -1,5 +1,7 @@
 package de.thkoeln.inf.D_Rot.main
 
+import guru.nidi.graphviz.model.Factory.node
+import guru.nidi.graphviz.model.Node
 import kotlin.math.max
 
 
@@ -7,6 +9,10 @@ import kotlin.math.max
  * Graph class handles all nodes
  */
 class BastiGraph:CustomGraph {
+    override fun isAcyclic(): Boolean {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
     override fun addEdge(start: Int, end: Int) {
         nodes[start][end] = 1
         nodes[end][start] = -1
@@ -53,10 +59,14 @@ class BastiGraph:CustomGraph {
     /**
      * returns the degree of the given note
      */
-    fun inDegree(note: Int) =
-        nodes[note]
-            .filter { it == -1 }
-            .size
+    fun inDegree(note: Int): MutableList<Int> {
+        val l = mutableListOf<Int>()
+        nodes[note].withIndex().forEach {
+            if (it.value==1)
+                l.add(it.index)
+        }
+        return l
+    }
 
 
     //                               __   _____  __          ____ ____
@@ -74,7 +84,7 @@ class BastiGraph:CustomGraph {
      *          index wird gesetzt (vergleiche Graphik eta)
      *      - geordnete Liste zurückgeben
      */
-    override fun topologicalSort(): List<Int> {
+    fun topologicalSort(): List<Int> {
         val n = nodes.size
         val visited = Array(n) { false } //array of all the visited nodes
         val ordering = Array(n) { 0 } //ouput
@@ -152,6 +162,18 @@ class BastiGraph:CustomGraph {
         return a
     }
 
+    override fun toVizNodes(): List<Node> {
+        val vizNodes = nodes.mapIndexed { index, _ ->
+            node("$index")
+        }.toMutableList()
+        for ((i, _) in nodes.withIndex()) {
+            val linkedNotes = inDegree(i)
+            linkedNotes.forEach{
+                vizNodes[i] = vizNodes[i].link(vizNodes[it])
+            }
+        }
+        return vizNodes.toList()
+    }
 }
 
 fun main(){
@@ -160,6 +182,7 @@ fun main(){
     g.addEdge(1,3)
     g.addEdge(1,4)
     println(g)
+    g.toPic()
     println(g.topologicalSort())
 }
 

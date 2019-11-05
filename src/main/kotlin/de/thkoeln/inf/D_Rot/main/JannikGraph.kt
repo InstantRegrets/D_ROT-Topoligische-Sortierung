@@ -1,5 +1,8 @@
 package de.thkoeln.inf.D_Rot.main
 
+import guru.nidi.graphviz.model.Factory.node
+import guru.nidi.graphviz.model.Node
+
 fun main(){
     val g = JannikGraph()
     g.addNode(1)
@@ -10,6 +13,7 @@ fun main(){
     g.addEdge(4,3)
     g.addEdge(2,1)
     g.addEdge(3,1)
+    g.toPic()
     g.topologicalSort().forEach { println(it.label) }
 
 
@@ -28,9 +32,6 @@ fun main(){
  * Graph class handles all Nodes
  */
 class JannikGraph: CustomGraph {
-    override fun getNodes(): Collection<Any> {
-        return nodes
-    }
 
     override fun isAcyclic(): Boolean {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
@@ -170,6 +171,17 @@ class JannikGraph: CustomGraph {
         zeroNodes.remove(nodeToProcess)
         out.add(nodeToProcess)
         return out
+    }
+    fun  Node.toVizBode(): guru.nidi.graphviz.model.Node =
+        node(this.label.toString())
+
+
+    override fun toVizNodes(): List<guru.nidi.graphviz.model.Node> {
+        val vizNodes = nodes.map { it to  it.toVizBode() }
+        return vizNodes.map { pair ->
+            pair.second.link(pair.first.successors.map { it.toVizBode() })
+        }
+
     }
 }
 
