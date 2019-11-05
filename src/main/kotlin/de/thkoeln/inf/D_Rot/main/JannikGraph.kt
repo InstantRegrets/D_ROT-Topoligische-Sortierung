@@ -43,7 +43,11 @@ class JannikGraph: CustomGraph {
      * Nodes contain a label for display purposes, a variable indegree, which is initialised at 0 and updated whenever
      * an edge is created containing this node.
      */
-    data class Node(var label: Int) {
+    data class Node(var label: Int,
+                    val successors: ArrayList<Node> = arrayListOf(),
+                    val predecessors: ArrayList<Node> = arrayListOf()
+    ) {
+
         //must override to compare nodes and int
         override fun equals(other: Any?): Boolean {
             if (other is Node) {
@@ -53,10 +57,7 @@ class JannikGraph: CustomGraph {
             }
             return false
         }
-
         var indegree: Int = 0 //on node creation indegree is always 0
-        val successors: ArrayList<Node> = arrayListOf()
-        val predecessors: ArrayList<Node> = arrayListOf()
 
         //for equal check nodes should always return labels
         override fun hashCode(): Int {
@@ -67,7 +68,6 @@ class JannikGraph: CustomGraph {
     /*
     *  Graph functions
     */
-
     private fun retrieveNodeOf(input: Int): Node? {
         return nodes.find { it.label == input }
     }
