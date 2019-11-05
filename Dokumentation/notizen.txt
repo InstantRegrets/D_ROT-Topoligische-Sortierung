@@ -1,0 +1,30 @@
+Topologische Sortierung
+
+Vorraussetzungen
+-Graph muss gerichtet sein
+-Graph darf keine Zyklen enthalten
+
+-> DAG
+
+Nicht unbedingt eine eindeutige Lösung / mehrere Lösungen möglich
+
+Es spielt keine Rolle, dass
+- mehrere Elemente ohne Vorgänger existieren
+- machne Elemente mehrere Nachfolger haben
+- manche Elemente mehrere Vorgänger haben
+
+Bsp mit Grafiken
+
+
+Schrittweise erklären:
+//Überprüfen ob der Graph azyklisch ist
+Graphen erstellen addNode(a,b)
+
+
+1) Knoten mit Null Vorgängern bestimmen
+2) Einen Beliebigen dieser "Null-Vorgänger-Knoten" auswählen
+	-> Reihenfolge irrelevant: bei Programmierung: Stack wird zuerst der letzte Knoten genommen
+						       Queue wird zuerst der erste Knoten genommen
+3) Diesesn Knoten makieren (zB -1 oder visited) und in Output schreiben
+4) Bei allen Nachfolgern dieses Knotens ebenfalls 1 abziehen
+5) Durch alle Schritte iterieren 1-4
