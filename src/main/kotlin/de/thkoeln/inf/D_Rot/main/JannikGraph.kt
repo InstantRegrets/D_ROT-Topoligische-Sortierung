@@ -1,23 +1,6 @@
 package de.thkoeln.inf.D_Rot.main
 
 import guru.nidi.graphviz.model.Factory.node
-import guru.nidi.graphviz.model.Node
-
-fun main(){
-    val g = JannikGraph()
-    g.addNode(1)
-    g.addNode(2)
-    g.addNode(3)
-    g.addNode(4)
-    g.addEdge(4,2)
-    g.addEdge(4,3)
-    g.addEdge(2,1)
-    g.addEdge(3,1)
-    g.toPic()
-    g.topologicalSort().forEach { println(it.label) }
-
-
-}
 
 //     _____                 _
 //    / ____|               | |
@@ -157,13 +140,13 @@ class JannikGraph: CustomGraph {
      * topological sorting of the graph
      * @return sorted ArrayList
      */
-        fun topologicalSort(): ArrayList<Node> {
+        override fun topologicalSort(): List<Int> {
         zeroNodes = findRoots().toMutableList()
         val out = arrayListOf<Node>()
         while (zeroNodes.isNotEmpty()) {
             inductiveStep(zeroNodes.first(), out)
         }
-        return out
+        return out.map { it.label }
     }
 
     //global var to be invoked by topologicalSort() and to be changed by inductiveStep
@@ -203,10 +186,3 @@ class JannikGraph: CustomGraph {
     }
 }
 
-//adding functions for list to behave like stack
-fun<E> ArrayList<E>.pop(): E{
-    return this.first().also { this.remove(it) }
-}
-fun <E> ArrayList<E>.push(input: E){
-    this.add(input)
-}

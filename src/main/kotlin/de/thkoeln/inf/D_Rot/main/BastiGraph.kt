@@ -9,7 +9,7 @@ import kotlin.math.max
  * Graph class handles all nodes
  */
 class BastiGraph:CustomGraph {
-    override fun isAcyclic(): Boolean {
+    override fun isAcyclic(input: JannikGraph.Node): Boolean {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
@@ -84,7 +84,7 @@ class BastiGraph:CustomGraph {
      *          index wird gesetzt (vergleiche Graphik eta)
      *      - geordnete Liste zurückgeben
      */
-    fun topologicalSort(): List<Int> {
+    override fun topologicalSort(): List<Int> {
         val n = nodes.size
         val visited = Array(n) { false } //array of all the visited nodes
         val ordering = Array(n) { 0 } //ouput
@@ -177,12 +177,5 @@ class BastiGraph:CustomGraph {
 }
 
 fun main(){
-    val g = BastiGraph()
-    g.addNode(5)
-    g.addEdge(1,3)
-    g.addEdge(1,4)
-    println(g)
-    g.toPic()
-    println(g.topologicalSort())
 }
 

@@ -23,15 +23,14 @@ interface CustomGraph {
 
     fun toVizNodes():List<Node>
 
-    fun toPic(sorted:Boolean = false){
+    fun topologicalSort(): Collection<Int>
+
+    fun toPic(name: String){
         val g = Factory.graph("example1").directed()
             .graphAttr().with(Rank.dir(Rank.RankDir.LEFT_TO_RIGHT))
             .with(toVizNodes())
         val d = Paths.get("out","graphs").toFile()
-        val f = if(sorted)
-            File(d,"sortedGraph.png")
-        else
-            File(d,"unsortedGraph.png")
+        val f = File(d,"$name.png")
         Graphviz.fromGraph(g).height(500).render(Format.PNG).toFile(f)
     }
 }
