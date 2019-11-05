@@ -11,5 +11,8 @@ interface CustomGraph {
 
     fun findRoots(): Collection<Any>
 
-    fun topologicalSort(): Collection<Any>
+    fun isAcyclic(): Boolean
+
+    fun getNodes():Collection<Any>
+
 }

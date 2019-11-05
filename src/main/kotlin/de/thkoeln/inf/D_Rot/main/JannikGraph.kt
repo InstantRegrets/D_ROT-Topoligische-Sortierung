@@ -1,5 +1,4 @@
 package de.thkoeln.inf.D_Rot.main
-import kotlin.collections.ArrayList
 
 fun main(){
     val g = JannikGraph()
@@ -29,6 +28,14 @@ fun main(){
  * Graph class handles all Nodes
  */
 class JannikGraph: CustomGraph {
+    override fun getNodes(): Collection<Any> {
+        return nodes
+    }
+
+    override fun isAcyclic(): Boolean {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
     private val nodes: ArrayList<Node> = arrayListOf()
 
     /**
@@ -46,10 +53,11 @@ class JannikGraph: CustomGraph {
             return false
         }
 
-        var indegree: Int = 0
+        var indegree: Int = 0 //on node creation indegree is always 0
         val successors: ArrayList<Node> = arrayListOf()
         val predecessors: ArrayList<Node> = arrayListOf()
 
+        //for equal check nodes should always return labels
         override fun hashCode(): Int {
             return label
         }
@@ -130,7 +138,7 @@ class JannikGraph: CustomGraph {
      * topological sorting of the graph
      * @return sorted ArrayList
      */
-    override fun topologicalSort(): ArrayList<Node> {
+        fun topologicalSort(): ArrayList<Node> {
         zeroNodes = findRoots().toMutableList()
         val out = arrayListOf<Node>()
         while (zeroNodes.isNotEmpty()) {
