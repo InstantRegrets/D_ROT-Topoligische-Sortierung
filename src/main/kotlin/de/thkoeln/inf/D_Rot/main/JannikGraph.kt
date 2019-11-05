@@ -1,6 +1,21 @@
 package de.thkoeln.inf.D_Rot.main
 
 import guru.nidi.graphviz.model.Factory.node
+import guru.nidi.graphviz.model.Node
+
+fun main(){
+    val g = JannikGraph()
+    g.addNode(1)
+    g.addNode(2)
+    g.addNode(3)
+    g.addNode(4)
+    g.addEdge(4,2)
+    g.addEdge(4,3)
+    g.addEdge(2,1)
+    g.addEdge(3,1)
+    println(g.isAcyclicWrapper())
+
+}
 
 //     _____                 _
 //    / ____|               | |
@@ -17,16 +32,34 @@ import guru.nidi.graphviz.model.Factory.node
 class JannikGraph: CustomGraph {
 
     private val visited = arrayListOf<Boolean>()
-    override fun isAcyclic(input: Node): Boolean {
+
+    fun isAcyclicWrapper(): Boolean{
         visited.clear()
         visited.fillToSize(nodes.size)
-        visited[nodes.indexOf(input)] = true
-        input.successors.forEach {
-            if (visited[nodes.indexOf(it)]){
+        nodes.forEach {
+            if(!isAcyclic(it)){
                 return false
             }
-            else{
-                isAcyclic(it)
+        }
+        return true
+    }
+
+    override fun isAcyclic(input: Node): Boolean {
+        val index01: Int = nodes.indexOf(input)
+        println("setting to true: $index01")
+        visited[index01] = true
+        if (input.successors.size>0){
+            input.successors.forEach {
+                val index: Int = nodes.indexOf(it)
+                if (visited[index]) {
+                    println("index $index has already been visited")
+                    return false
+                } else {
+                    println("cycling for ${it.label}")
+                    if(isAcyclic(it)){
+                        return true
+                    }
+                }
             }
         }
         return true
