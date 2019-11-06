@@ -13,6 +13,7 @@ class BastiGraph:CustomGraph {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
+
     override fun addEdge(start: Int, end: Int) {
         nodes[start][end] = 1
         nodes[end][start] = -1
