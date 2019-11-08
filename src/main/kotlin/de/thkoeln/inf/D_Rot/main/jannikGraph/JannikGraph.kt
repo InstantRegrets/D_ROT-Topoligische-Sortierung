@@ -1,21 +1,8 @@
-package de.thkoeln.inf.D_Rot.main
+package de.thkoeln.inf.D_Rot.main.jannikGraph
 
+import de.thkoeln.inf.D_Rot.main.CustomGraph
 import guru.nidi.graphviz.model.Factory.node
-import guru.nidi.graphviz.model.Node
 
-fun main(){
-    val g = JannikGraph()
-    g.addNode(1)
-    g.addNode(2)
-    g.addNode(3)
-    g.addNode(4)
-    g.addEdge(4,2)
-    g.addEdge(4,3)
-    g.addEdge(2,1)
-    g.addEdge(3,1)
-    println(g.isAcyclicWrapper())
-
-}
 
 //     _____                 _
 //    / ____|               | |
@@ -30,47 +17,6 @@ fun main(){
  * Graph class handles all Nodes
  */
 class JannikGraph: CustomGraph {
-
-    private val visited = arrayListOf<Boolean>()
-
-    fun isAcyclicWrapper(): Boolean{
-        visited.clear()
-        visited.fillToSize(nodes.size)
-        nodes.forEach {
-            if(!isAcyclic(it)){
-                return false
-            }
-        }
-        return true
-    }
-
-    override fun isAcyclic(input: Node): Boolean {
-        val index01: Int = nodes.indexOf(input)
-        println("setting to true: $index01")
-        visited[index01] = true
-        if (input.successors.size>0){
-            input.successors.forEach {
-                val index: Int = nodes.indexOf(it)
-                if (visited[index]) {
-                    println("index $index has already been visited")
-                    return false
-                } else {
-                    println("cycling for ${it.label}")
-                    if(isAcyclic(it)){
-                        return true
-                    }
-                }
-            }
-        }
-        return true
-    }
-
-    private fun ArrayList<Boolean>.fillToSize(index: Int, value: Boolean=false){
-        repeat(index){
-            this.getOrElse(it){ this.add(value)}
-        }
-    }
-
     private val nodes: ArrayList<Node> = arrayListOf()
 
     /**
@@ -102,6 +48,16 @@ class JannikGraph: CustomGraph {
     /*
     *  Graph functions
     */
+
+    /**
+     * @return ArrayList of all Nodes
+     */
+    fun getNodes() = nodes
+
+    /**
+     * helper function to resolve Integers to Node Objects
+     * @return node with given label, if not found null
+     */
     private fun retrieveNodeOf(input: Int): Node? {
         return nodes.find { it.label == input }
     }
@@ -156,64 +112,59 @@ class JannikGraph: CustomGraph {
 
     /**
      *
-     * @return an array with all starting nodes
+     * @return a mutable list with all starting nodes
      */
-    override fun findRoots(): List<Node> = nodes.filter { it.indegree == 0 }
-
-//             _                  _ _   _
-//       /\   | |                (_) | | |
-//      /  \  | | __ _  ___  _ __ _| |_| |__  _ __ ___
-//     / /\ \ | |/ _` |/ _ \| '__| | __| '_ \| '_ ` _ \
-//    / ____ \| | (_| | (_) | |  | | |_| | | | | | | | |
-//   /_/    \_\_|\__, |\___/|_|  |_|\__|_| |_|_| |_| |_|
-//                __/ |
-//               |___/
+    override fun findRoots(): MutableList<Node> = nodes.filter { it.indegree == 0 }.toMutableList()
 
     /**
      * topological sorting of the graph
      * @return sorted ArrayList
      */
-        override fun topologicalSort(): List<Int> {
-        zeroNodes = findRoots().toMutableList()
-        val out = arrayListOf<Node>()
-        while (zeroNodes.isNotEmpty()) {
-            inductiveStep(zeroNodes.first(), out)
+    override fun isAcyclic(): Boolean {
+        val nodesToProcess = findRoots()
+        val processed = arrayListOf<Node>()
+        while (nodesToProcess.isNotEmpty()) {
+            cyclicStep(nodesToProcess.first(), nodesToProcess, processed)
         }
-        return out.map { it.label }
+        if (processed.size < nodes.size){
+            println("is cyclic - check graph please")
+            return false
+        }
+        return true
     }
 
-    //global var to be invoked by topologicalSort() and to be changed by inductiveStep
-    //contains all nodes with an indegree of 0, for the topological sort to use
-    private var zeroNodes: MutableList<Node> = arrayListOf()
-
     /**
-     * inductiveStep takes the node to process, decreases the indegree of all successor nodes, checks if their indegree
-     * is now 0 and if so, adds them to the list of nodes to process (zeroNodes).
-     * it then proceeds to mark the current node as processed (removing it from the array and adding it to the output array)
-     * @param nodeToProcess a node with an indegree of 0
-     * @param out ArrayList of type node which will be the output list
-     * @return changed output arrayList
+     *  helper function for isAcyclic()
+     *  @param nodeToProcess current Node
+     *  @param remainingNodes ArrayList of remaining Nodes with Indegree 0
+     *  @param processed Array List of already processed nodes, for comparison with normal nodes
      */
-    private fun inductiveStep(nodeToProcess: Node, out: ArrayList<Node>): ArrayList<Node> {
+    private fun cyclicStep(nodeToProcess: Node,remainingNodes: MutableList<Node> , processed: ArrayList<Node>) {
         nodeToProcess.successors.forEach {
             it.indegree--
             if (it.indegree == 0) {
-                zeroNodes.add(it)
+                remainingNodes.add(it)
             }
-            it.predecessors.remove(nodeToProcess)
         }
-        zeroNodes.remove(nodeToProcess)
-        out.add(nodeToProcess)
-        return out
+        remainingNodes.remove(nodeToProcess)
+        processed.add(nodeToProcess)
     }
-    fun Node.toVizBode(): guru.nidi.graphviz.model.Node =
+
+//    _____
+//    |  __ \
+//    | |  | |_ __ __ ___      __
+//    | |  | | '__/ _` \ \ /\ / /
+//    | |__| | | | (_| |\ V  V /
+//    |_____/|_|  \__,_| \_/\_/
+
+    // Stuff for graphical output
+    private fun Node.toVizNode(): guru.nidi.graphviz.model.Node =
         node(this.label.toString())
 
-
     override fun toVizNodes(): List<guru.nidi.graphviz.model.Node> {
-        val vizNodes = nodes.map { it to  it.toVizBode() }
+        val vizNodes = nodes.map { it to  it.toVizNode() }
         return vizNodes.map { pair ->
-            pair.second.link(pair.first.successors.map { it.toVizBode() })
+            pair.second.link(pair.first.successors.map { it.toVizNode() })
         }
 
     }

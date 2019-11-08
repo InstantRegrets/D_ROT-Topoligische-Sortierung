@@ -1,5 +1,6 @@
 package de.thkoeln.inf.D_Rot.main
 
+import de.thkoeln.inf.D_Rot.main.jannikGraph.JannikGraph
 import guru.nidi.graphviz.attribute.Rank
 import guru.nidi.graphviz.engine.Format
 import guru.nidi.graphviz.engine.Graphviz
@@ -19,11 +20,11 @@ interface CustomGraph {
 
     fun findRoots(): Collection<Any>
 
-    fun isAcyclic(input: JannikGraph.Node): Boolean
+    fun isAcyclic(): Boolean
 
     fun toVizNodes():List<Node>
 
-    fun topologicalSort(): Collection<Int>
+  //  fun topologicalSort(): Collection<Int>
 
     fun toPic(name: String){
         val g = Factory.graph("example1").directed()
