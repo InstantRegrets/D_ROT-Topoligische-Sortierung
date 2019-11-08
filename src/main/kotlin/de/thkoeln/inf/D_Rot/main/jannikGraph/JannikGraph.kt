@@ -111,14 +111,13 @@ class JannikGraph: CustomGraph {
     }
 
     /**
-     *
      * @return a mutable list with all starting nodes
      */
     override fun findRoots(): MutableList<Node> = nodes.filter { it.indegree == 0 }.toMutableList()
 
     /**
-     * topological sorting of the graph
-     * @return sorted ArrayList
+     * checks graph for cycles
+     * @return true if graph does not contain cycles else false
      */
     override fun isAcyclic(): Boolean {
         val nodesToProcess = findRoots()
