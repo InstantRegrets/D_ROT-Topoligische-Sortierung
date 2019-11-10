@@ -12,6 +12,6 @@ fun main(){
     g.addEdge(2,1)
     g.addEdge(3,1)
     //g.addEdge(1,4)
-    TopologicalSort().topologicalSort(g).forEach { println(it) }
+    TopologicalSort.topologicalSort(g).forEach { println(it) }
     println(g.isAcyclic())
 }
