@@ -6,7 +6,7 @@ import de.thkoeln.inf.D_Rot.main.Graph
 
 fun main(){
     val graph = createBaseGraph()
-    graph.toPic("Output_Graph")
+    graph.toPic("GraphPicture")
     topologicalSort(graph).forEach { println(it) }
 }
 

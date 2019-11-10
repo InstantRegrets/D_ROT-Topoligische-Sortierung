@@ -175,7 +175,7 @@ class Graph {
         val g = Factory.graph("example1").directed()
             .graphAttr().with(Rank.dir(Rank.RankDir.LEFT_TO_RIGHT))
             .with(toVizNodes())
-        val d = Paths.get("out","graphs").toFile()
+        val d = Paths.get("src","main","kotlin","de","thkoeln","inf","D_Rot","livecoding").toFile()
         val f = File(d,"$name.png")
         Graphviz.fromGraph(g).height(500).render(Format.PNG).toFile(f)
     }
