@@ -1,5 +1,6 @@
 package de.thkoeln.inf.D_Rot.main
 
+import de.thkoeln.inf.D_Rot.main.jannikGraph.JannikGraph
 import guru.nidi.graphviz.model.Factory.node
 import guru.nidi.graphviz.model.Node
 import kotlin.math.max
@@ -9,7 +10,7 @@ import kotlin.math.max
  * Graph class handles all nodes
  */
 class BastiGraph:CustomGraph {
-    override fun isAcyclic(input: JannikGraph.Node): Boolean {
+    override fun isAcyclic(): Boolean {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
@@ -85,7 +86,7 @@ class BastiGraph:CustomGraph {
      *          index wird gesetzt (vergleiche Graphik eta)
      *      - geordnete Liste zurückgeben
      */
-    override fun topologicalSort(): List<Int> {
+    fun topologicalSort(): List<Int> {
         val n = nodes.size
         val visited = Array(n) { false } //array of all the visited nodes
         val ordering = Array(n) { 0 } //ouput

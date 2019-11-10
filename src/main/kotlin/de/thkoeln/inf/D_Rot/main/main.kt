@@ -2,6 +2,8 @@
 
 package de.thkoeln.inf.D_Rot.main
 
+import de.thkoeln.inf.D_Rot.main.jannikGraph.JannikGraph
+
 /***
  * using jgrapht: https://jgrapht.org/
  */
@@ -22,7 +24,7 @@ fun main(){
     g.addEdge(2,1)
     g.addEdge(4,1)
     g.toPic("BastiGraph")
-    println(g.topologicalSort())
+   // println(g.topologicalSort())
 
     println("press enter for jannik's graph")
     readLine()
@@ -43,8 +45,9 @@ fun main(){
     g.addEdge(4,3)
     g.addEdge(2,1)
     g.addEdge(3,1)
+    g.addEdge(1,4)
     g.toPic("JannikGraph")
-    println(g.topologicalSort())
+    //println(g.topologicalSort())
 }
 
 
