@@ -1,6 +1,8 @@
-package de.thkoeln.inf.D_Rot.main.jannikGraph
+package de.thkoeln.inf.D_Rot.livecoding
 
-class TopologicalSort() {
+import de.thkoeln.inf.D_Rot.main.jannikGraph.JannikGraph
+
+class TopologicalSort {
     /**
      * topological sorting of the graph
      * @return sorted ArrayList of Integers (the labels of the nodes)
@@ -10,7 +12,11 @@ class TopologicalSort() {
             val nodesToProcess = graph.findRoots()
             val out = arrayListOf<JannikGraph.Node>()
             while (nodesToProcess.isNotEmpty()) {
-                inductiveStep(nodesToProcess.first(), nodesToProcess as ArrayList<JannikGraph.Node>, out)
+                inductiveStep(
+                    nodesToProcess.first(),
+                    nodesToProcess as ArrayList<JannikGraph.Node>,
+                    out
+                )
             }
             if (out.size < graph.getNodes().size) {
                 println("is cyclic - check graph please")
@@ -33,16 +39,7 @@ class TopologicalSort() {
             remainingNodes: ArrayList<JannikGraph.Node>,
             processedNodes: ArrayList<JannikGraph.Node>
         ): ArrayList<JannikGraph.Node> {
-            remainingNodes.remove(nodeToProcess)
-            processedNodes.add(nodeToProcess)
-            nodeToProcess.successors.forEach {
-                it.indegree--
-                if (it.indegree == 0) {
-                    remainingNodes.add(it)
-                }
-                it.predecessors.remove(nodeToProcess)
-            }
-            return processedNodes
+            TODO("Soll im live coding implementiert werden")
         }
     }
 }
