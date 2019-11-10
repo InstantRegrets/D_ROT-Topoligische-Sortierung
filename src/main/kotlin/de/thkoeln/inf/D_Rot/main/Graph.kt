@@ -1,7 +1,12 @@
-package de.thkoeln.inf.D_Rot.main.jannikGraph
+package de.thkoeln.inf.D_Rot.main
 
-import de.thkoeln.inf.D_Rot.main.CustomGraph
+import guru.nidi.graphviz.attribute.Rank
+import guru.nidi.graphviz.engine.Format
+import guru.nidi.graphviz.engine.Graphviz
+import guru.nidi.graphviz.model.Factory
 import guru.nidi.graphviz.model.Factory.node
+import java.io.File
+import java.nio.file.Paths
 
 
 //     _____                 _
@@ -16,7 +21,7 @@ import guru.nidi.graphviz.model.Factory.node
 /**
  * Graph class handles all Nodes
  */
-class JannikGraph: CustomGraph {
+class Graph {
     private val nodes: ArrayList<Node> = arrayListOf()
 
     /**
@@ -65,14 +70,14 @@ class JannikGraph: CustomGraph {
     /**
      *  adds a Node with a given label to the Node-Array
      */
-    override fun addNode(input: Int) {
+    fun addNode(input: Int) {
         nodes.add(Node(input))
     }
 
     /**
      * adds an Edge with a given start and end point, also updates indegree of end node
      */
-    override fun addEdge(start: Int, end: Int) {
+    fun addEdge(start: Int, end: Int) {
         val temp = retrieveNodeOf(start)
         val temp2 = retrieveNodeOf(end)
         if (temp != null && temp2 != null) {
@@ -91,7 +96,7 @@ class JannikGraph: CustomGraph {
      * @param start is the Label of the desired start node
      * @param end is the label of the desired end node
      */
-    override fun removeEdge(start: Int, end: Int) {
+    fun removeEdge(start: Int, end: Int) {
         val startNode = retrieveNodeOf(start)
         val endNode = retrieveNodeOf(end)
         if (startNode != null && endNode != null) {
@@ -106,20 +111,20 @@ class JannikGraph: CustomGraph {
      * removes node with given label from the node array
      * @param input label of node to remove as Int
      */
-    override fun removeNode(input: Int) {
+    fun removeNode(input: Int) {
         nodes.remove(retrieveNodeOf(input))
     }
 
     /**
      * @return a mutable list with all starting nodes
      */
-    override fun findRoots(): MutableList<Node> = nodes.filter { it.indegree == 0 }.toMutableList()
+    fun findRoots(): MutableList<Node> = nodes.filter { it.indegree == 0 }.toMutableList()
 
     /**
      * checks graph for cycles
      * @return true if graph does not contain cycles else false
      */
-    override fun isAcyclic(): Boolean {
+    fun isAcyclic(): Boolean {
         val nodesToProcess = findRoots()
         val processed = arrayListOf<Node>()
         while (nodesToProcess.isNotEmpty()) {
@@ -138,7 +143,7 @@ class JannikGraph: CustomGraph {
      *  @param remainingNodes ArrayList of remaining Nodes with Indegree 0
      *  @param processed Array List of already processed nodes, for comparison with normal nodes
      */
-    private fun cyclicStep(nodeToProcess: Node,remainingNodes: MutableList<Node> , processed: ArrayList<Node>) {
+    private fun cyclicStep(nodeToProcess: Node, remainingNodes: MutableList<Node>, processed: ArrayList<Node>) {
         nodeToProcess.successors.forEach {
             it.indegree--
             if (it.indegree == 0) {
@@ -160,12 +165,19 @@ class JannikGraph: CustomGraph {
     private fun Node.toVizNode(): guru.nidi.graphviz.model.Node =
         node(this.label.toString())
 
-    override fun toVizNodes(): List<guru.nidi.graphviz.model.Node> {
+    private fun toVizNodes(): List<guru.nidi.graphviz.model.Node> {
         val vizNodes = nodes.map { it to  it.toVizNode() }
         return vizNodes.map { pair ->
             pair.second.link(pair.first.successors.map { it.toVizNode() })
         }
-
+    }
+    fun toPic(name: String){
+        val g = Factory.graph("example1").directed()
+            .graphAttr().with(Rank.dir(Rank.RankDir.LEFT_TO_RIGHT))
+            .with(toVizNodes())
+        val d = Paths.get("out","graphs").toFile()
+        val f = File(d,"$name.png")
+        Graphviz.fromGraph(g).height(500).render(Format.PNG).toFile(f)
     }
 }
 

@@ -2,16 +2,16 @@
 
 package de.thkoeln.inf.D_Rot.livecoding
 
-import de.thkoeln.inf.D_Rot.main.jannikGraph.*
+import de.thkoeln.inf.D_Rot.main.Graph
 
 fun main(){
     val graph = createBaseGraph()
     graph.toPic("Output_Graph")
-    TopologicalSort.topologicalSort(graph).forEach { println(it) }
+    topologicalSort(graph).forEach { println(it) }
 }
 
-fun createBaseGraph(): JannikGraph{
-    val graph = JannikGraph()
+fun createBaseGraph(): Graph {
+    val graph = Graph()
     graph.addNode(1)
     graph.addNode(2)
     graph.addNode(3)

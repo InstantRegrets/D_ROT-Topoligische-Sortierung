@@ -1,8 +1,8 @@
 //only for personal testing
-package de.thkoeln.inf.D_Rot.main.jannikGraph
+package de.thkoeln.inf.D_Rot.main
 
 fun main(){
-    val g = JannikGraph()
+    val g = Graph()
     g.addNode(1)
     g.addNode(2)
     g.addNode(3)
@@ -12,6 +12,6 @@ fun main(){
     g.addEdge(2,1)
     g.addEdge(3,1)
     //g.addEdge(1,4)
-    TopologicalSort.topologicalSort(g).forEach { println(it) }
+    topologicalSort(g).forEach { println(it) }
     println(g.isAcyclic())
 }
